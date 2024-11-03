@@ -1,0 +1,9 @@
+basePath: /api
+host: localhost:8080
+info:
+  contact: {}
+  description: Пример API для управления worker-пулом.
+  title: Worker Pool API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
