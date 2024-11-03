@@ -38,13 +38,20 @@ func AddJobHandler(pool *worker.Pool) http.HandlerFunc {
 			http.Error(w, "job is required", http.StatusBadRequest)
 			return
 		}
-		pool.AssignJob(job)
-		_, err := fmt.Fprintf(w, "Задача добавлена: %s\n", job)
-		if err != nil {
-			log.Fatalf("failed to write response: %v", err)
+
+		// Назначаем задание и получаем ID воркера
+		workerID := pool.AssignJob(job)
+		if workerID == -1 {
+			http.Error(w, "Нет доступных воркеров для обработки задачи", http.StatusServiceUnavailable)
 			return
 		}
+
+		// Пишем ответ с ID воркера
 		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprintf(w, "Задача добавлена: %s, ей занимается воркер с ID: %d\n", job, workerID)
+		if err != nil {
+			log.Printf("failed to write response: %v", err)
+		}
 	}
 }
 
@@ -61,6 +68,7 @@ func AddWorkerHandler(pool *worker.Pool, poolLock *sync.Mutex) http.HandlerFunc 
 		newID := len(pool.Workers) + 1
 		pool.AddWorker(newID)
 		_, err := fmt.Fprintf(w, "Воркер добавлен с ID: %d\n", newID)
+
 		if err != nil {
 			log.Fatalf("failed to write response: %v", err)
 			return
@@ -79,8 +87,13 @@ func RemoveWorkerHandler(pool *worker.Pool, poolLock *sync.Mutex) http.HandlerFu
 	return func(w http.ResponseWriter, r *http.Request) {
 		poolLock.Lock()
 		defer poolLock.Unlock()
+		if len(pool.Workers) == 0 {
+			http.Error(w, "Нет воркеров для удаления", http.StatusBadRequest)
+			return
+		}
 		pool.RemoveWorker()
-		_, err := fmt.Fprintln(w, "Воркер удален")
+		remainingWorkers := len(pool.Workers)
+		_, err := fmt.Fprintln(w, "Воркер удален, количество живых воркеров: ", remainingWorkers)
 		if err != nil {
 			log.Fatalf("failed to write response: %v", err)
 			return
