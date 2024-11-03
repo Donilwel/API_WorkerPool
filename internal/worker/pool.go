@@ -31,7 +31,7 @@ func (p *Pool) AddWorker(id int) {
 
 func (p *Pool) RemoveWorker() {
 	if len(p.Workers) == 0 {
-		fmt.Println("worker pool is empty")
+		fmt.Println("Воркер пустой")
 		return
 	}
 	worker := p.Workers[len(p.Workers)-1]
