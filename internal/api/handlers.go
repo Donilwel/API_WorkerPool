@@ -52,7 +52,7 @@ func AddJobHandler(pool *worker.Pool) http.HandlerFunc {
 // @Summary Добавить воркера
 // @Description Добавляет нового воркера в пул
 // @Tags Worker
-// @Success 200 {string} string "Воркер добавлен"
+// @Success 200 {string} string "Воркер добавлен с уникальным ID"
 // @Router /api/add_worker [post]
 func AddWorkerHandler(pool *worker.Pool, poolLock *sync.Mutex) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

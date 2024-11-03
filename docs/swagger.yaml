@@ -5,5 +5,59 @@ info:
   description: Пример API для управления worker-пулом.
   title: Worker Pool API
   version: "1.0"
-paths: {}
+paths:
+  /api/add_job:
+    post:
+      description: Добавляет задачу в пул для обработки воркерами
+      parameters:
+      - description: Задача для обработки
+        in: query
+        name: job
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Задача добавлена
+          schema:
+            type: string
+        "400":
+          description: job is required
+          schema:
+            type: string
+      summary: Добавить задачу
+      tags:
+      - Worker
+  /api/add_worker:
+    post:
+      description: Добавляет нового воркера в пул
+      responses:
+        "200":
+          description: Воркер добавлен с уникальным ID
+          schema:
+            type: string
+      summary: Добавить воркера
+      tags:
+      - Worker
+  /api/ping:
+    get:
+      description: Проверка доступности сервера
+      responses:
+        "200":
+          description: PONG
+          schema:
+            type: string
+      summary: Пинг-сервер
+      tags:
+      - Health
+  /api/remove_worker:
+    delete:
+      description: Удаляет одного воркера из пула
+      responses:
+        "200":
+          description: Воркер удален
+          schema:
+            type: string
+      summary: Удалить воркера
+      tags:
+      - Worker
 swagger: "2.0"

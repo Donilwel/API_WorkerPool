@@ -14,7 +14,91 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/api/add_job": {
+            "post": {
+                "description": "Добавляет задачу в пул для обработки воркерами",
+                "tags": [
+                    "Worker"
+                ],
+                "summary": "Добавить задачу",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Задача для обработки",
+                        "name": "job",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Задача добавлена",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "job is required",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/add_worker": {
+            "post": {
+                "description": "Добавляет нового воркера в пул",
+                "tags": [
+                    "Worker"
+                ],
+                "summary": "Добавить воркера",
+                "responses": {
+                    "200": {
+                        "description": "Воркер добавлен с уникальным ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ping": {
+            "get": {
+                "description": "Проверка доступности сервера",
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Пинг-сервер",
+                "responses": {
+                    "200": {
+                        "description": "PONG",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/remove_worker": {
+            "delete": {
+                "description": "Удаляет одного воркера из пула",
+                "tags": [
+                    "Worker"
+                ],
+                "summary": "Удалить воркера",
+                "responses": {
+                    "200": {
+                        "description": "Воркер удален",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
