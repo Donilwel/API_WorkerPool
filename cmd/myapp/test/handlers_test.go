@@ -116,3 +116,74 @@ func TestAddWorkerHandler(t *testing.T) {
 		}
 	})
 }
+
+func TestRemoveWorkerHandler(t *testing.T) {
+	pool := worker.NewPool()
+	mu := sync.Mutex{}
+	handler := api.RemoveWorkerHandler(pool, &mu)
+
+	t.Run("RemoveWorkerWithZero", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/api/remove_worker", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, req)
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
+
+		example := "Нет воркеров для удаления\n"
+		body := rr.Body.String()
+
+		if body != example {
+			t.Errorf("handler returned unexpected body: got\n %v want\n %v", body, example)
+		}
+
+		if len(pool.Workers) != 0 {
+			t.Errorf("handler returned wrong len of workers: got %d, want %d", len(pool.Workers), 0)
+		}
+	})
+	pool.AddWorker(1)
+
+	t.Run("RemoveWorkerWithOne", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/api/remove_worker", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, req)
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
+		example := "Воркер удален, количество живых воркеров:  0\n"
+		body := rr.Body.String()
+		if body != example {
+			t.Errorf("handler returned unexpected body: got\n %v want\n %v", body, example)
+		}
+		if len(pool.Workers) != 0 {
+			t.Errorf("handler returned wrong len of workers: got %d, want %d", len(pool.Workers), 0)
+		}
+	})
+	pool.AddWorker(2)
+
+	t.Run("RemoveWorkerWithTwo", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/api/remove_worker", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, req)
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
+		example := "Воркер удален, количество живых воркеров:  1\n"
+		body := rr.Body.String()
+		if body != example {
+			t.Errorf("handler returned unexpected body: got\n %v want\n %v", body, example)
+		}
+		if len(pool.Workers) != 1 {
+			t.Errorf("handler returned wrong len of workers: got %d, want %d", len(pool.Workers), 1)
+		}
+	})
+}
