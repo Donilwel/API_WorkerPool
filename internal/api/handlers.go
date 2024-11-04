@@ -61,10 +61,10 @@ func AddJobHandler(pool *worker.Pool) http.HandlerFunc {
 // @Tags Worker
 // @Success 200 {string} string "Воркер добавлен с уникальным ID"
 // @Router /api/add_worker [post]
-func AddWorkerHandler(pool *worker.Pool, poolLock *sync.Mutex) http.HandlerFunc {
+func AddWorkerHandler(pool *worker.Pool, mu *sync.Mutex) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		poolLock.Lock()
-		defer poolLock.Unlock()
+		mu.Lock()
+		defer mu.Unlock()
 		newID := len(pool.Workers) + 1
 		pool.AddWorker(newID)
 		_, err := fmt.Fprintf(w, "Воркер добавлен с ID: %d\n", newID)
@@ -83,10 +83,10 @@ func AddWorkerHandler(pool *worker.Pool, poolLock *sync.Mutex) http.HandlerFunc 
 // @Tags Worker
 // @Success 200 {string} string "Воркер удален"
 // @Router /api/remove_worker [delete]
-func RemoveWorkerHandler(pool *worker.Pool, poolLock *sync.Mutex) http.HandlerFunc {
+func RemoveWorkerHandler(pool *worker.Pool, mu *sync.Mutex) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		poolLock.Lock()
-		defer poolLock.Unlock()
+		mu.Lock()
+		defer mu.Unlock()
 		if len(pool.Workers) == 0 {
 			http.Error(w, "Нет воркеров для удаления", http.StatusBadRequest)
 			return

@@ -42,11 +42,11 @@ func (p *Pool) RemoveWorker() {
 func (p *Pool) AssignJob(job string) int {
 	if len(p.Workers) == 0 {
 		fmt.Println("Нет доступных воркеров для обработки задачи")
-		return -1 // Возвращаем -1, если нет доступных воркеров
+		return -1
 	}
 	randWorker := p.Workers[rand.Intn(len(p.Workers))]
 	randWorker.JobQueue <- job
-	return randWorker.ID // Возвращаем ID воркера
+	return randWorker.ID
 }
 
 func (p *Pool) Wait() {
