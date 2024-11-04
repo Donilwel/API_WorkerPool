@@ -165,6 +165,7 @@ func TestRemoveWorkerHandler(t *testing.T) {
 			t.Errorf("handler returned wrong len of workers: got %d, want %d", len(pool.Workers), 0)
 		}
 	})
+	pool.AddWorker(1)
 	pool.AddWorker(2)
 
 	t.Run("RemoveWorkerWithTwo", func(t *testing.T) {
